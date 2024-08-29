@@ -1,10 +1,17 @@
 import asyncio
 from aiogram.filters import CommandStart
 from loader import dp, bot, db
-from aiogram import types, F, html
+from aiogram import types, F, html, suppress
 from filters.instagram_check_url import CheckInstaLink
 from .func import download_instagram
 from keyboards.inline.buttons import button, friend_connect
+from middlewares.my_middleware import CheckSubCallback
+from utils.misc.subscription import checksubscription
+from data.config import CHANNELS
+from aiogram.utils.keyboard import InlineKeyboardBuilder
+from aiogram.exceptions import TelegramBadRequest
+
+
 @dp.message(CommandStart())
 async def start_bot(message: types.Message):
     current_user = message.from_user.id
@@ -43,6 +50,7 @@ async def test(message: types.Message):
                                                                 f'📥 {html.link(value="Instagram downloader", link="https://t.me/instgram_downloader_bot")}',
                                        reply_markup=friend_connect())
             msg = await message.answer('Tayyor')
+            await message.delete()
             await asyncio.sleep(1)
             await msg.delete()
         else:
@@ -64,3 +72,46 @@ async def test1(message: types.Message):
     await message.answer('Iltimos instgram link yuboring')
 
 
+@dp.callback_query(CheckSubCallback.filter())
+async def check_query(call:types.CallbackQuery):
+    print('Working')
+    await call.answer(cache_time=60)
+    user = call.from_user
+    final_status = True
+    btn = InlineKeyboardBuilder()
+    if CHANNELS:
+        for channel in CHANNELS:
+            status = True
+            try:
+                status = await checksubscription(user_id=user.id, channel=channel)
+            except Exception as e:
+                print(e)
+                pass
+            final_status *= status
+            try:
+                chat = await bot.get_chat(chat_id=channel)
+                if status:
+                    btn.button(text=f"✅ {chat.title}", url=f"{await chat.export_invite_link()}")
+                else:
+                    btn.button(text=f"❌ {chat.title}", url=f"{await chat.export_invite_link()}")
+            except Exception as e:
+                print(e)
+                pass
+        if final_status:
+            await call.message.answer(
+                "Siz hamma kanalga a'zo bo'lgansiz!"
+            )
+        else:
+
+            btn.button(
+                text="🔄 Tekshirish",
+                callback_data=CheckSubCallback(check=False)
+            )
+            btn.adjust(1)
+            with suppress(TelegramBadRequest):
+                await call.message.edit_text("Iltimos bot to'liq ishlashi uchun quyidagi kanal(lar)ga obuna bo'ling!",
+                                             reply_markup=btn.as_markup())
+    else:
+        await call.message.answer(
+            "Siz hamma kanalga a'zo bo'lgansiz!"
+        )
