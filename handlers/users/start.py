@@ -33,10 +33,13 @@ async def start_bot(message: types.Message):
 @dp.message(F.text, CheckInstaLink())
 async def test(message: types.Message):
     link = message.text
-    video_url, caption = download_instagram(link=link)
+    one_message = await bot.send_message(chat_id=message.from_user.id, text='📹 Video serverdan yuklanmoqda\n'
+                                                                            'Iltimos biroz kuting !')
+    video_url, caption = await download_instagram(link=link)
     try:
         if video_url:
             data = await bot.send_message(chat_id=message.from_user.id, text='Yuklanmoqda...')
+            await one_message.delete()
             for i in range(1, 11):
                 percent = i * 10
                 white = '⬛️'
