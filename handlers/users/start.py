@@ -34,9 +34,12 @@ async def start_bot(message: types.Message):
 
 
 
-
 loader = instaloader.Instaloader()
-loader.login('abduvohid_2629', '20042629')
+try:
+    loader.login('abduvohid_2629', '20042629')
+except instaloader.exceptions.LoginException as e:
+    print(f"Login failed: {e}")
+
 
 @dp.message(F.text, CheckInstaLink())
 async def handle_instagram_video(message: types.Message):
@@ -96,6 +99,8 @@ async def handle_instagram_video(message: types.Message):
     except Exception as e:
         await bot.send_message(chat_id=user_id, text=f"Xatolik yuz berdi: {e}")
         print(e)
+
+        
 @dp.message(F.text)
 async def test1(message: types.Message):
     await message.answer('Iltimos instgram link yuboring')
