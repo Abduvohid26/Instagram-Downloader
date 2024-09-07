@@ -35,6 +35,7 @@ async def start_bot(message: types.Message):
 
 
 loader = instaloader.Instaloader()
+loader.login(user="Abduvohid_2629", passwd="20042629")
 
 @dp.message(F.text, CheckInstaLink())
 async def handle_instagram_video(message: types.Message):
