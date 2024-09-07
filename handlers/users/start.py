@@ -35,11 +35,6 @@ async def start_bot(message: types.Message):
 
 
 loader = instaloader.Instaloader()
-try:
-    loader.login('abduvohid_2629', '20042629')
-except instaloader.exceptions.LoginException as e:
-    print(f"Login failed: {e}")
-
 
 @dp.message(F.text, CheckInstaLink())
 async def handle_instagram_video(message: types.Message):
