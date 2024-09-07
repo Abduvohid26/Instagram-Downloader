@@ -32,10 +32,15 @@ async def start_bot(message: types.Message):
         print(e)
 
 
-
-
+username = 'Abduvohid_2629'
+password = '20042629'
 loader = instaloader.Instaloader()
-loader.login(user="Abduvohid_2629", passwd="20042629")
+
+try:
+    loader.login(username, password)
+    print("Login muvaffaqiyatli amalga oshirildi.")
+except instaloader.exceptions.LoginException as e:
+    print(f"Login xatolik yuz berdi: {e}")
 
 @dp.message(F.text, CheckInstaLink())
 async def handle_instagram_video(message: types.Message):
