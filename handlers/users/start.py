@@ -35,15 +35,17 @@ async def start_bot(message: types.Message):
 username = 'Abduvohid_2629'
 password = '20042629'
 loader = instaloader.Instaloader()
-
-try:
-    loader.login(username, password)
-    print("Login muvaffaqiyatli amalga oshirildi.")
-except instaloader.exceptions.LoginException as e:
-    print(f"Login xatolik yuz berdi: {e}")
+loader.login(username, password)
+loader.interactive_login(username)
+loader.load_session_from_file(username)
+# try:
+#     loader.login(username, password)
+#     print("Login muvaffaqiyatli amalga oshirildi.")
+# except instaloader.exceptions.LoginException as e:
+#     print(f"Login xatolik yuz berdi: {e}")
 
 @dp.message(F.text, CheckInstaLink())
-async def handle_instagram_video(message: types.Message):
+async def handle_instagram_video(message: types.Message)    :
     link = message.text
     user_id = message.from_user.id
     loading_message = await bot.send_message(
@@ -72,7 +74,7 @@ async def handle_instagram_video(message: types.Message):
                     percent = i * 10
                     progress_bar = '⬛️' * i + '⬜️' * (10 - i)
                     await progress_message.edit_text(text=f'{progress_bar}\n{percent}% yuklandi')
-                    await asyncio.sleep(0.5)
+                    await asyncio.sleep(0.1)
 
                 await progress_message.delete()
 
