@@ -11,6 +11,7 @@ charset-normalizer==3.3.2
 environs==11.0.0
 frozenlist==1.4.1
 idna==3.7
+instaloader==4.13.1
 magic-filter==1.0.12
 marshmallow==3.22.0
 multidict==6.0.5
