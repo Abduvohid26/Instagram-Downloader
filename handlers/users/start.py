@@ -31,18 +31,15 @@ async def start_bot(message: types.Message):
     except Exception as e:
         print(e)
 
-
-username = 'Abduvohid_2629'
-password = '20042629'
+username = 'abduvohid_2629'
 loader = instaloader.Instaloader()
-loader.login(username, password)
-loader.interactive_login(username)
-loader.load_session_from_file(username)
-# try:
-#     loader.login(username, password)
-#     print("Login muvaffaqiyatli amalga oshirildi.")
-# except instaloader.exceptions.LoginException as e:
-#     print(f"Login xatolik yuz berdi: {e}")
+
+try:
+    session_path = os.path.expanduser(f'~/.config/instaloader/session-{username}')
+    loader.load_session_from_file(username)
+    print("Session loaded successfully.")
+except FileNotFoundError:
+    print("Session file not found. Please transfer the session file from your local machine.")
 
 @dp.message(F.text, CheckInstaLink())
 async def handle_instagram_video(message: types.Message)    :
