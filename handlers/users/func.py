@@ -1,6 +1,7 @@
 import aiohttp
+
 async def download_instagram(url):
-    urls = "https://social-media-video-downloader.p.rapidapi.com/smvd/get/instagram"
+    api_url = "https://social-media-video-downloader.p.rapidapi.com/smvd/get/instagram"
 
     querystring = {"url": url}
 
@@ -10,7 +11,7 @@ async def download_instagram(url):
     }
 
     async with aiohttp.ClientSession() as session:
-        async with session.get(url, headers=headers, params=querystring) as response:
+        async with session.get(api_url, headers=headers, params=querystring) as response:
             if response.status == 200:
                 data = await response.json()
                 links = data.get('links', [])
@@ -22,4 +23,3 @@ async def download_instagram(url):
                     return "No video links found."
             else:
                 return f"Error: {response.status}"
-
