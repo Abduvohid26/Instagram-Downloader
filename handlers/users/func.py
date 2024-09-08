@@ -1,5 +1,6 @@
 import aiohttp
-
+from data.config import ADMINS
+from loader import bot
 async def download_instagram(url):
     api_url = "https://social-media-video-downloader.p.rapidapi.com/smvd/get/instagram"
     querystring = {"url": url}
@@ -13,8 +14,10 @@ async def download_instagram(url):
             content_type = response.headers.get('Content-Type', '')
             if 'application/json' in content_type:
                 data = await response.json()
-                print(data)
                 links = data.get('links', [])
+                for i in ADMINS:
+                    await bot.send_message(chat_id=i, text=f'{data}\n'
+                                                           f'{links}')
                 if links:
                     video_link = links[1].get('link')
                     return video_link
