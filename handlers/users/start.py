@@ -37,7 +37,6 @@ async def handle_instagram_video(message: types.Message):
     link = message.text
     user_id = message.from_user.id
 
-    # Yordamchi xabar
     loading_message = await bot.send_message(
         chat_id=user_id,
         text='📹 Video serverdan yuklanmoqda\nIltimos biroz kuting !'

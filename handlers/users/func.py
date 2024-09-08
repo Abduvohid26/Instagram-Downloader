@@ -1,7 +1,7 @@
 import aiohttp
 
 async def download_instagram(url):
-    api_url = "https://social-media-video-downloader.p.rapidapi.com/smvd/get/facebook"
+    api_url = "https://social-media-video-downloader.p.rapidapi.com/smvd/get/instagram"
     querystring = {"url": url}
     headers = {
         "x-rapidapi-key": "54e518fa11msha164dc2cecb21c8p18d479jsn65ee0a8c6b70",
@@ -13,9 +13,10 @@ async def download_instagram(url):
             content_type = response.headers.get('Content-Type', '')
             if 'application/json' in content_type:
                 data = await response.json()
+                print(data)
                 links = data.get('links', [])
                 if links:
-                    video_link = links[0].get('link')
+                    video_link = links[1].get('link')
                     return video_link
                 else:
                     return "No video links found."
