@@ -1,6 +1,6 @@
 import aiohttp
 async def download_instagram(url):
-    url = "https://social-media-video-downloader.p.rapidapi.com/smvd/get/instagram"
+    urls = "https://social-media-video-downloader.p.rapidapi.com/smvd/get/instagram"
 
     querystring = {"url": url}
 
