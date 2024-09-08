@@ -15,7 +15,6 @@ async def download_instagram(url):
             if response.status == 200:
                 data = await response.json()
                 links = data.get('links', [])
-                print(links)
                 if links:
                     video_link = links[-1].get('link')
                     return video_link
