@@ -12,6 +12,7 @@ from aiogram.exceptions import TelegramBadRequest
 import asyncio
 from aiogram import types
 from .func import download_instagram
+from aiogram.enums.chat_action import ChatAction
 
 @dp.message(CommandStart())
 async def start_bot(message: types.Message):
@@ -60,7 +61,7 @@ async def handle_instagram_video(message: types.Message):
             await asyncio.sleep(0.1)
 
         await progress_message.delete()
-
+        await bot.send_chat_action(chat_id=message.chat.id, action=ChatAction.UPLOAD_VIDEO)
         await bot.send_video(
             chat_id=user_id,
             video=video_link,
