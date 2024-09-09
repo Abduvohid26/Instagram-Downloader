@@ -92,58 +92,48 @@ async def test1(message: types.Message):
     await message.answer('Iltimos instgram link yuboring')
 
 
+
 @dp.callback_query(CheckSubCallback.filter())
 async def check_query(call: types.CallbackQuery):
-    print('Working')
-    await call.answer(cache_time=60)
+    await call.answer(cache_time=0)  # Har safar callback query ga javob
     user = call.from_user
     final_status = True
     btn = InlineKeyboardBuilder()
 
     if CHANNELS:
         for channel in CHANNELS:
-            status = True
             try:
-                # Check if the user is subscribed
                 status = await checksubscription(user_id=user.id, channel=channel)
-            except Exception as e:
-                print(f"Subscription check error: {e}")
-
-            # Update final status
-            final_status = final_status and status
-
-            try:
-                # Get chat and create button
+                final_status = final_status and status
                 chat = await bot.get_chat(chat_id=channel)
                 invite_link = await chat.export_invite_link()
-                button_text = f"✅ {chat.title}" if status else f"❌ {chat.title}"
-                btn.button(text=button_text, url=invite_link)
+                btn.button(
+                    text=f"{'✅' if status else '❌'} {chat.title}",
+                    url=invite_link
+                )
             except Exception as e:
-                print(f"Chat error: {e}")
+                print(f"Kanalga kirish yoki linkni olishda xato: {e}")
 
         if final_status:
             await call.message.answer(
                 f"Assalomu alaykum {call.from_user.full_name}!\n\n"
-                f"Ushbu bot yordamida Instagramdan video yuklab olishingiz mumkin.",
+                f"Marhamat, botdan foydalanishingiz mumkin.",
                 reply_markup=button()
             )
         else:
-            # Add 'Retry' button with correct callback data
             btn.button(
                 text="🔄 Tekshirish",
-                callback_data=CheckSubCallback.new(check=False)  # Callback data to'g'ri formatda
+                callback_data=CheckSubCallback(check=False)
             )
             btn.adjust(1)
-
-            # Safely edit the message with suppressing specific errors
-            with suppress(TelegramBadRequest):
-                await call.message.edit_text(
-                    "Iltimos bot to'liq ishlashi uchun quyidagi kanal(lar)ga obuna bo'ling!",
-                    reply_markup=btn.as_markup()
-                )
+            data = await call.message.answer(
+                text="Iltimos avval barcha kanallarga azo boling !"
+            )
+            await asyncio.sleep(5)
+            await data.delete()
     else:
         await call.message.answer(
             f"Assalomu alaykum {call.from_user.full_name}!\n\n"
-            f"Ushbu bot yordamida Instagramdan video yuklab olishingiz mumkin.",
+            f"Marhamat, botdan foydalanishingiz mumkin.",
             reply_markup=button()
         )
