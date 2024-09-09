@@ -15,9 +15,9 @@ class UserCheckMiddleware(BaseMiddleware):
         event: Update,
         data: Dict[str, Any]
     ) -> bool:
-        btn  = InlineKeyboardBuilder()
+        btn = InlineKeyboardBuilder()
         user = event.from_user
-        final_status  = True
+        final_status = True
         print(CHANNELS)
         if CHANNELS:
             for channel in CHANNELS:
@@ -25,29 +25,30 @@ class UserCheckMiddleware(BaseMiddleware):
                 try:
                     status = await checksubscription(user_id=user.id, channel=channel)
                 except Exception as e:
-                    print(e)
-                    pass
-                final_status *= status
+                    print(f"Subscription check error: {e}")
+
+                final_status = final_status and status
+
                 try:
                     chat = await bot.get_chat(chat_id=channel)
-                    if status:
-                        btn.button(text=f"✅ {chat.title}", url=f"{await chat.export_invite_link()}")
-                    else:
-                        btn.button(text=f"❌ {chat.title}", url=f"{await chat.export_invite_link()}")
+                    invite_link = await chat.export_invite_link()
+                    button_text = f"✅ {chat.title}" if status else f"❌ {chat.title}"
+                    btn.button(text=button_text, url=invite_link)
                 except Exception as e:
-                    print(e)
-                    pass
+                    print(f"Chat error: {e}")
+
             if final_status:
                 await handler(event, data)
             else:
-
                 btn.button(
                     text="🔄 Tekshirish",
-                    callback_data=CheckSubCallback(check=False)
+                    callback_data=CheckSubCallback.new(check=False)  # To'g'ri formatda callback data yaratish
                 )
                 btn.adjust(1)
-                await event.answer("Iltimos bot to'liq ishlashi uchun quyidagi kanal(lar)ga obuna bo'ling!",
-                                   reply_markup=btn.as_markup())
+                await event.message.answer(
+                    "Iltimos bot to'liq ishlashi uchun quyidagi kanal(lar)ga obuna bo'ling!",
+                    reply_markup=btn.as_markup()
+                )
         else:
-            return await handler(event, data)
+            await handler(event, data)
 

@@ -93,49 +93,57 @@ async def test1(message: types.Message):
 
 
 @dp.callback_query(CheckSubCallback.filter())
-async def check_query(call:types.CallbackQuery):
+async def check_query(call: types.CallbackQuery):
     print('Working')
     await call.answer(cache_time=60)
     user = call.from_user
     final_status = True
     btn = InlineKeyboardBuilder()
+
     if CHANNELS:
         for channel in CHANNELS:
             status = True
             try:
+                # Check if the user is subscribed
                 status = await checksubscription(user_id=user.id, channel=channel)
             except Exception as e:
-                print(e)
-                pass
-            final_status *= status
+                print(f"Subscription check error: {e}")
+
+            # Update final status
+            final_status = final_status and status
+
             try:
+                # Get chat and create button
                 chat = await bot.get_chat(chat_id=channel)
-                if status:
-                    btn.button(text=f"✅ {chat.title}", url=f"{await chat.export_invite_link()}")
-                else:
-                    btn.button(text=f"❌ {chat.title}", url=f"{await chat.export_invite_link()}")
+                invite_link = await chat.export_invite_link()
+                button_text = f"✅ {chat.title}" if status else f"❌ {chat.title}"
+                btn.button(text=button_text, url=invite_link)
             except Exception as e:
-                print(e)
-                pass
+                print(f"Chat error: {e}")
+
         if final_status:
             await call.message.answer(
-                f"Assalomu alaykum {call.message.from_user.full_name}!\n\n"
+                f"Assalomu alaykum {call.from_user.full_name}!\n\n"
                 f"Ushbu bot yordamida Instagramdan video yuklab olishingiz mumkin.",
                 reply_markup=button()
             )
         else:
-
+            # Add 'Retry' button with correct callback data
             btn.button(
                 text="🔄 Tekshirish",
-                callback_data=CheckSubCallback(check=False)
+                callback_data=CheckSubCallback.new(check=False)  # Callback data to'g'ri formatda
             )
             btn.adjust(1)
+
+            # Safely edit the message with suppressing specific errors
             with suppress(TelegramBadRequest):
-                await call.message.edit_text("Iltimos bot to'liq ishlashi uchun quyidagi kanal(lar)ga obuna bo'ling!",
-                                             reply_markup=btn.as_markup())
+                await call.message.edit_text(
+                    "Iltimos bot to'liq ishlashi uchun quyidagi kanal(lar)ga obuna bo'ling!",
+                    reply_markup=btn.as_markup()
+                )
     else:
         await call.message.answer(
-            f"Assalomu alaykum {call.message.from_user.full_name}!\n\n"
+            f"Assalomu alaykum {call.from_user.full_name}!\n\n"
             f"Ushbu bot yordamida Instagramdan video yuklab olishingiz mumkin.",
             reply_markup=button()
         )
