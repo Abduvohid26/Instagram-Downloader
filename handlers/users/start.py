@@ -119,7 +119,9 @@ async def check_query(call:types.CallbackQuery):
                 pass
         if final_status:
             await call.message.answer(
-                "Siz hamma kanalga a'zo bo'lgansiz!"
+                f"Assalomu alaykum {call.message.from_user.full_name}!\n\n"
+                f"Ushbu bot yordamida Instagramdan video yuklab olishingiz mumkin.",
+                reply_markup=button()
             )
         else:
 
