@@ -31,7 +31,6 @@ async def start_bot(message: types.Message):
         print(e)
 
 
-
 @dp.message(F.text, CheckInstaLink())
 async def handle_instagram_video(message: types.Message):
     link = message.text
@@ -43,11 +42,10 @@ async def handle_instagram_video(message: types.Message):
     )
 
     try:
-        # Instagram videosini yuklash
-        video_link = await download_instagram(link)
-        if "No video links found." in video_link or "Error" in video_link:
+        video_link = download_instagram(link)
+
+        if not video_link or "Error" in video_link:
             await bot.send_message(chat_id=user_id, text="Video topilmadi yoki yuklashda xato yuz berdi.")
-            await loading_message.delete()
             return
 
         progress_message = await bot.send_message(chat_id=user_id, text='Yuklanmoqda...')
@@ -74,9 +72,11 @@ async def handle_instagram_video(message: types.Message):
         await final_message.delete()
 
     except Exception as e:
-        await bot.send_message(chat_id=user_id, text=f"Xatolik yuz berdi: {e}")
+        await bot.send_message(chat_id=user_id, text=f"Xatolik yuz berdi: {str(e)}")
         print(e)
-
+    finally:
+        # Ensure loading message is deleted in case of errors
+        await loading_message.delete()
         
 @dp.message(F.text)
 async def test1(message: types.Message):
