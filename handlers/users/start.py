@@ -44,13 +44,21 @@ async def handle_instagram_video(message: types.Message):
     try:
         video_link = download_instagram(link)
 
+        # Video linkini tekshirish
         if not video_link or "Error" in video_link:
             await bot.send_message(chat_id=user_id, text="Video topilmadi yoki yuklashda xato yuz berdi.")
             return
 
+        if not video_link.startswith("http"):
+            await bot.send_message(chat_id=user_id, text="Yuklangan video URL noto'g'ri.")
+            return
+
         progress_message = await bot.send_message(chat_id=user_id, text='Yuklanmoqda...')
+        await asyncio.sleep(1)  # Tez-tez so'rov yuborishdan saqlanish
+
         await loading_message.delete()
 
+        # Yuklanayotganlik progressini ko'rsatish
         for i in range(1, 11):
             percent = i * 10
             progress_bar = '⬛️' * i + '⬜️' * (10 - i)
@@ -75,8 +83,10 @@ async def handle_instagram_video(message: types.Message):
         await bot.send_message(chat_id=user_id, text=f"Xatolik yuz berdi: {str(e)}")
         print(e)
     finally:
-        # Ensure loading message is deleted in case of errors
-        await loading_message.delete()
+        try:
+            await loading_message.delete()
+        except Exception:
+            pass  # O'chirish xatolarini e'tiborsiz qoldirish
         
 @dp.message(F.text)
 async def test1(message: types.Message):
